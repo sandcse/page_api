@@ -1,0 +1,7 @@
+services:
+  page_api.rest_helper:
+    class: Drupal\page_api\RestHelper
+    arguments: []
+  page_api.router:
+    class: Drupal\page_api\RoutingService
+    arguments: []

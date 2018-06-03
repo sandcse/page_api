@@ -1,0 +1,5 @@
+name: Page Restful API
+type: module
+description: 'This module provides the page Restful API of a given node.'
+package: Custom modules
+core: 8.x

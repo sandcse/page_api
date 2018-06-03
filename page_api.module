@@ -1,0 +1,76 @@
+<?php
+
+/**
+ * @file
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+
+/**
+ * Implements hook_help().
+ *
+ * Displays help and module information.
+ *
+ * @param path
+ *   Which path of the site we're using to display help
+ * @param arg
+ *   Array that holds the current path as returned from arg() function
+ */
+function page_api_help($path, $arg) {
+  switch ($path) {
+    case "help.page.page_api":
+      return '' . t("Please read README.TXT in module root folder.") . '';
+
+    break;
+  }
+}
+
+/**
+ * Implements hook_form_alter().
+ */
+function page_api_form_alter(&$form, FormStateInterface $form_state, $form_id) {
+  $siteapikey = \Drupal::config('system.site')->get('siteapikey');
+
+  if ($form_id == 'system_site_information_settings') {
+
+    if (empty($siteapikey)) {
+      $siteapikey = t('No API is set yet');
+    }
+
+    $form['api_details'] = [
+      '#type' => 'details',
+      '#title' => t('API details'),
+      '#open' => TRUE,
+    ];
+    $form['api_details']['siteapikey'] = [
+      '#type' => 'textfield',
+      '#title' => t('Site API key'),
+      '#default_value' => $siteapikey,
+      '#required' => TRUE,
+    ];
+    $form['actions']['submit']['#value'] = t('Update Configuration');
+    // Adding custom submit handler for saving apikey.
+    $form['#submit'][] = 'page_api_override_form_submit';
+  }
+}
+
+/**
+ * Submit handler for saving siteapikey.
+ */
+function page_api_override_form_submit(array $form, FormStateInterface $form_state) {
+
+  $config = \Drupal::service('config.factory')->getEditable('system.site');
+  // Save new apikey value.
+  $config->set('siteapikey', $form_state->getValue('siteapikey'))->save();
+  drupal_set_message(t('Site API key has been saved with: @key', ['@key' => $form_state->getValue('siteapikey')]));
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function page_api_uninstall() {
+
+  // Remove the siteapikey config.
+  $config = \Drupal::service('config.factory')->getEditable('system.site');
+  $config->set('siteapikey', '')->save();
+}

@@ -1,0 +1,2 @@
+route_callbacks:
+  - 'page_api.router:routes'
